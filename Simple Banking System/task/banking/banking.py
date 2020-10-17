@@ -1,6 +1,26 @@
 from random import randint
 
 
+def checksum(card_number):
+    total = 0
+    for i in range(0, len(card_number)):
+        temp = int(card_number[i])
+        if i % 2 != 1:
+            temp *= 2
+        if temp > 9:
+            temp -= 9
+        total += temp
+    return total % 10 == 0
+
+
+def generate_card_number():
+    check = False
+    while not check:
+        card_number = "400000" + "".join([str(randint(0, 9)) for _i in range(0, 10)])
+        check = checksum(card_number)
+    return card_number
+
+
 class APM:
     def __init__(self):
         self.card_data = {}
@@ -30,7 +50,7 @@ class APM:
             print()
 
     def create_account(self):
-        card_number = "400000" + "".join([str(randint(0, 9)) for _i in range(0, 10)])
+        card_number = generate_card_number()
         pin = "".join([str(randint(0, 9)) for _i in range(0, 4)])
         self.card_data[card_number] = [pin, 0]
         print("Your card has been created")
