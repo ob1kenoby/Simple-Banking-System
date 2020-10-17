@@ -52,8 +52,8 @@ class APM:
     def create_account(self):
         card_number = generate_card_number()
         pin = "".join([str(randint(0, 9)) for _i in range(0, 4)])
-        cursor.execute("INSERT INTO card (id, number, pin)"
-                       "VALUES ((SELECT Count(*) FROM card) + 1, {0}, {1});".format(card_number, pin))
+        cursor.execute("INSERT INTO card (number, pin)"
+                       "VALUES ({0}, {1});".format(card_number, pin))
         connector.commit()
         print("Your card has been created")
         print("Your card number:")
@@ -92,7 +92,7 @@ cursor = connector.cursor()
 cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='card';")
 if not cursor.fetchone():
     cursor.execute("CREATE TABLE card("
-                   "id INTEGER NOT NULL UNIQUE, "
+                   "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                    "number TEXT NOT NULL, "
                    "pin TEXT NOT NULL, "
                    "balance INTEGER DEFAULT 0);")
