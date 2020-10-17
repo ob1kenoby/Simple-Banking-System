@@ -22,12 +22,16 @@ class APM:
                 self.create_account()
             elif user_choice == "2" and self.logged_in:
                 self.login()
+            elif user_choice == "1" and not self.logged_in:
+                self.show_balance()
+            elif user_choice == "2" and not self.logged_in:
+                self.logout()
             print()
 
     def create_account(self):
         card_number = "400000" + "".join([str(randint(0, 9)) for _i in range(0, 10)])
         pin = "".join([str(randint(0, 9)) for _i in range(0, 4)])
-        self.card_data[card_number] = pin
+        self.card_data[card_number] = [pin, 0]
         print("Your card has been created")
         print("Your card number:")
         print(card_number)
@@ -40,8 +44,12 @@ class APM:
         print()
         if card_number not in self.card_data:
             print("Wrong card number or PIN!")
-            if self.card_data[card_number] != pin:
+            if self.card_data[card_number][0] != pin:
                 print("Wrong card number or PIN!")
-        elif self.card_data[card_number] == pin:
+        elif self.card_data[card_number][0] == pin:
             print("You have successfully logged in!")
         self.logged_in = True
+
+    def logout(self):
+        self.logged_in = False
+        print("You have successfully logged out!")
