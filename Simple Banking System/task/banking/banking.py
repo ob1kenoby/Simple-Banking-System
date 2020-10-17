@@ -5,6 +5,7 @@ class APM:
     def __init__(self):
         self.card_data = {}
         self.logged_in = False
+        self.current_card = None
 
     def menu(self):
         user_choice = ""
@@ -18,13 +19,13 @@ class APM:
             print("0. Exit")
             print()
             user_choice = input()
-            if user_choice == "1" and self.logged_in:
+            if user_choice == "1" and not self.logged_in:
                 self.create_account()
-            elif user_choice == "2" and self.logged_in:
-                self.login()
-            elif user_choice == "1" and not self.logged_in:
-                self.show_balance()
             elif user_choice == "2" and not self.logged_in:
+                self.login()
+            elif user_choice == "1" and self.logged_in:
+                self.show_balance()
+            elif user_choice == "2" and self.logged_in:
                 self.logout()
             print()
 
@@ -44,12 +45,22 @@ class APM:
         print()
         if card_number not in self.card_data:
             print("Wrong card number or PIN!")
-            if self.card_data[card_number][0] != pin:
-                print("Wrong card number or PIN!")
         elif self.card_data[card_number][0] == pin:
             print("You have successfully logged in!")
-        self.logged_in = True
+            self.logged_in = True
+            self.current_card = card_number
+        else:
+            print("Wrong card number or PIN!")
 
     def logout(self):
         self.logged_in = False
+        self.current_card = None
         print("You have successfully logged out!")
+
+    def show_balance(self):
+        print("Balance: {}".format(self.card_data[self.current_card][1]))
+
+
+apm = APM()
+apm.menu()
+print("Bye!")
