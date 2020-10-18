@@ -35,8 +35,8 @@ def create_account():
     print(pin)
 
 
-def update_balance(id, balance):
-    cursor.execute("UPDATE card SET balance = {0} WHERE id = {1};".format(balance, id))
+def update_balance(user_id, balance):
+    cursor.execute("UPDATE card SET balance = {0} WHERE id = {1};".format(balance, user_id))
     connector.commit()
 
 
@@ -84,7 +84,7 @@ class APM:
         card_number = input("Enter your card number: ")
         pin = input("Enter your PIN: ")
         print()
-        cursor.execute("SELECT id, card, balance FROM card "
+        cursor.execute("SELECT id, number, balance FROM card "
                        "WHERE number = '{0}' AND pin = '{1}';".format(card_number, pin))
         logging_user = cursor.fetchone()
         if logging_user:
