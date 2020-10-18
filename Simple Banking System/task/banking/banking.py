@@ -25,7 +25,7 @@ def checksum(card_number):
 def create_account():
     card_number = generate_card_number()
     pin = "".join([str(randint(0, 9)) for _i in range(0, 4)])
-    cursor.execute("INSERT INTO card (number, pin)"
+    cursor.execute("INSERT INTO card (number, pin) "
                    "VALUES ({0}, {1});".format(card_number, pin))
     connector.commit()
     print("Your card has been created")
@@ -33,6 +33,11 @@ def create_account():
     print(card_number)
     print("Your card PIN:")
     print(pin)
+
+
+def update_balance(id, balance):
+    cursor.execute("UPDATE card SET balance = {0} WHERE id = {1};".format(balance, id))
+    connector.commit()
 
 
 class APM:
@@ -104,23 +109,29 @@ class APM:
     def add_income(self):
         income = input("Enter income: ")
         self.current_balance += income
-        self.update_balance()
+        update_balance(self.current_user, self.current_balance)
 
     def transfer(self):
         destination_card = input("Enter card number: ")
-        if checksum(destination_card):
-            transfer_amount = input("Enter how much money you want to transfer: ")
-            if transfer_amount > self.current_balance:
-                print("Not enough money!")
-            else:
-                self.current_balance -= transfer_amount
-                self.update_balance()
+        if destination_card == self.current_card:
+            print("You can't transfer money to the same account!")
         else:
-            print("Probably you made a mistake in the card number. Please try again!")
-
-    def update_balance(self):
-        cursor.execute("UPDATE card SET balance = {0} WHERE id = {1}".format(self.current_balance, self.current_user))
-        connector.commit()
+            if checksum(destination_card):
+                cursor.execute("SELECT id, balance FROM card "
+                               "WHERE card = {};".format(destination_card))
+                destination_user = cursor.fetchone()
+                if destination_user:
+                    transfer_amount = input("Enter how much money you want to transfer: ")
+                    if transfer_amount > self.current_balance:
+                        print("Not enough money!")
+                    else:
+                        self.current_balance -= transfer_amount
+                        update_balance(self.current_user, self.current_balance)
+                        update_balance(destination_user[0], destination_user[1])
+                else:
+                    print("Such a card does not exist.")
+            else:
+                print("Probably you made a mistake in the card number. Please try again!")
 
 
 connector = sqlite3.connect('card.s3db')
