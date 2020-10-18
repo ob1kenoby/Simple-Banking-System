@@ -22,6 +22,19 @@ def checksum(card_number):
     return total % 10 == 0
 
 
+def create_account():
+    card_number = generate_card_number()
+    pin = "".join([str(randint(0, 9)) for _i in range(0, 4)])
+    cursor.execute("INSERT INTO card (number, pin)"
+                   "VALUES ({0}, {1});".format(card_number, pin))
+    connector.commit()
+    print("Your card has been created")
+    print("Your card number:")
+    print(card_number)
+    print("Your card PIN:")
+    print(pin)
+
+
 class APM:
     def __init__(self):
         self.logged_in = False
@@ -42,7 +55,7 @@ class APM:
             print()
             user_choice = input()
             if user_choice == "1" and not self.logged_in:
-                self.create_account()
+                create_account()
             elif user_choice == "2" and not self.logged_in:
                 self.login()
             elif user_choice == "1" and self.logged_in:
@@ -50,18 +63,6 @@ class APM:
             elif user_choice == "2" and self.logged_in:
                 self.logout()
             print()
-
-    def create_account(self):
-        card_number = generate_card_number()
-        pin = "".join([str(randint(0, 9)) for _i in range(0, 4)])
-        cursor.execute("INSERT INTO card (number, pin)"
-                       "VALUES ({0}, {1});".format(card_number, pin))
-        connector.commit()
-        print("Your card has been created")
-        print("Your card number:")
-        print(card_number)
-        print("Your card PIN:")
-        print(pin)
 
     def login(self):
         card_number = input("Enter your card number: ")
