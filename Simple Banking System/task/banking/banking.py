@@ -47,21 +47,32 @@ class APM:
         while user_choice != "0":
             if self.logged_in:
                 print("1. Show balance")
-                print("2. Log out")
+                print("2. Add income")
+                print("3. Do transfer")
+                print("4. Close account")
+                print("5. Log out")
             else:
                 print("1. Create an account")
                 print("2. Log into account")
             print("0. Exit")
             print()
             user_choice = input()
-            if user_choice == "1" and not self.logged_in:
-                create_account()
-            elif user_choice == "2" and not self.logged_in:
-                self.login()
-            elif user_choice == "1" and self.logged_in:
-                self.show_balance()
-            elif user_choice == "2" and self.logged_in:
-                self.logout()
+            if self.logged_in:
+                if user_choice == "1":
+                    self.show_balance()
+                elif user_choice == "2":
+                    self.add_income()
+                elif user_choice == "3":
+                    self.transfer()
+                elif user_choice == "4":
+                    self.close_account()
+                elif user_choice == "5":
+                    self.logout()
+            else:
+                if user_choice == "1":
+                    create_account()
+                elif user_choice == "2":
+                    self.login()
             print()
 
     def login(self):
