@@ -101,6 +101,12 @@ class APM:
     def show_balance(self):
         print("Balance: {}".format(self.current_balance))
 
+    def add_income(self):
+        income = input("Enter income: ")
+        self.current_balance += income
+        cursor.execute("UPDATE card SET balance = {0} WHERE id = {1}".format(self.current_balance, self.current_user))
+        connector.commit()
+
 
 connector = sqlite3.connect('card.s3db')
 cursor = connector.cursor()
