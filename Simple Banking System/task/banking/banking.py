@@ -10,14 +10,6 @@ def generate_card_number():
     return card_number
 
 
-def generate_card_number():
-    check = False
-    while not check:
-        card_number = "400000" + "".join([str(randint(0, 9)) for _i in range(0, 10)])
-        check = checksum(card_number)
-    return card_number
-
-
 def checksum(card_number):
     total = 0
     for i in range(0, len(card_number)):
@@ -111,4 +103,6 @@ if not cursor.fetchone():
 
 apm = APM()
 apm.menu()
+cursor.close()
+connector.close()
 print("Bye!")
