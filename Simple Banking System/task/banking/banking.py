@@ -107,6 +107,18 @@ class APM:
         cursor.execute("UPDATE card SET balance = {0} WHERE id = {1}".format(self.current_balance, self.current_user))
         connector.commit()
 
+    def transfer(self):
+        destination_card = input("Enter card number: ")
+        if checksum(destination_card):
+            transfer_amount = input("Enter how much money you want to transfer: ")
+            if transfer_amount > self.current_balance:
+                print("Not enough money!")
+            else:
+                self.current_balance -= transfer_amount
+                self.change_balance()
+        else:
+            print("Probably you made a mistake in the card number. Please try again!")
+
 
 connector = sqlite3.connect('card.s3db')
 cursor = connector.cursor()
