@@ -133,6 +133,11 @@ class APM:
             else:
                 print("Probably you made a mistake in the card number. Please try again!")
 
+    def close_account(self):
+        cursor.execute("DELETE FROM card WHERE id = {};".format(self.current_user))
+        connector.commit()
+        self.logout()
+
 
 connector = sqlite3.connect('card.s3db')
 cursor = connector.cursor()
