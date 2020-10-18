@@ -1,4 +1,13 @@
 from random import randint
+import sqlite3
+
+
+def generate_card_number():
+    check = False
+    while not check:
+        card_number = "400000" + "".join([str(randint(0, 9)) for _i in range(0, 10)])
+        check = checksum(card_number)
+    return card_number
 
 
 def checksum(card_number):
@@ -13,19 +22,10 @@ def checksum(card_number):
     return total % 10 == 0
 
 
-def generate_card_number():
-    check = False
-    while not check:
-        card_number = "400000" + "".join([str(randint(0, 9)) for _i in range(0, 10)])
-        check = checksum(card_number)
-    return card_number
-
-
 class APM:
     def __init__(self):
-        self.card_data = {}
         self.logged_in = False
-        self.current_card = None
+        self.current_user = None
 
     def menu(self):
         user_choice = ""
@@ -52,7 +52,9 @@ class APM:
     def create_account(self):
         card_number = generate_card_number()
         pin = "".join([str(randint(0, 9)) for _i in range(0, 4)])
-        self.card_data[card_number] = [pin, 0]
+        cursor.execute("INSERT INTO card (number, pin)"
+                       "VALUES ({0}, {1});".format(card_number, pin))
+        connector.commit()
         print("Your card has been created")
         print("Your card number:")
         print(card_number)
@@ -63,23 +65,38 @@ class APM:
         card_number = input("Enter your card number: ")
         pin = input("Enter your PIN: ")
         print()
-        if card_number not in self.card_data:
-            print("Wrong card number or PIN!")
-        elif self.card_data[card_number][0] == pin:
+        cursor.execute("SELECT id FROM card "
+                       "WHERE number = '{0}' AND pin = '{1}';".format(card_number, pin))
+        holder_id = cursor.fetchone()
+        if holder_id:
             print("You have successfully logged in!")
             self.logged_in = True
-            self.current_card = card_number
+            self.current_user = holder_id
         else:
             print("Wrong card number or PIN!")
 
     def logout(self):
         self.logged_in = False
-        self.current_card = None
+        self.current_user = None
         print("You have successfully logged out!")
 
     def show_balance(self):
-        print("Balance: {}".format(self.card_data[self.current_card][1]))
+        cursor.execute("SELECT balance FROM card "
+                       "WHERE id = {};".format(self.current_user))
+        balance = cursor.fetchone()
+        print("Balance: {}".format(balance))
 
+
+connector = sqlite3.connect('card.s3db')
+cursor = connector.cursor()
+cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='card';")
+if not cursor.fetchone():
+    cursor.execute("CREATE TABLE card("
+                   "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                   "number TEXT NOT NULL, "
+                   "pin TEXT NOT NULL, "
+                   "balance INTEGER DEFAULT 0);")
+    connector.commit()
 
 apm = APM()
 apm.menu()
