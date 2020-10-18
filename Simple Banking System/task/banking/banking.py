@@ -81,20 +81,20 @@ class APM:
             print()
 
     def login(self):
-        card_number = input("Enter your card number: ")
-        pin = input("Enter your PIN: ")
+        card_number = input("Enter your card number: ").strip()
+        pin = input("Enter your PIN: ").strip()
         print()
         cursor.execute("SELECT id, number, balance FROM card "
                        "WHERE number = '{0}' AND pin = '{1}';".format(card_number, pin))
         logging_user = cursor.fetchone()
-        if logging_user:
+        if logging_user is None:
+            print("Wrong card number or PIN!")
+        else:
             print("You have successfully logged in!")
             self.logged_in = True
             self.current_user = logging_user[0]
             self.current_card = logging_user[1]
             self.current_balance = logging_user[2]
-        else:
-            print("Wrong card number or PIN!")
 
     def logout(self):
         self.logged_in = False
@@ -107,29 +107,30 @@ class APM:
         print("Balance: {}".format(self.current_balance))
 
     def add_income(self):
-        income = input("Enter income: ")
+        income = int(input("Enter income: "))
         self.current_balance += income
         update_balance(self.current_user, self.current_balance)
 
     def transfer(self):
-        destination_card = input("Enter card number: ")
+        destination_card = input("Enter card number: ").strip()
         if destination_card == self.current_card:
             print("You can't transfer money to the same account!")
         else:
             if checksum(destination_card):
                 cursor.execute("SELECT id, balance FROM card "
-                               "WHERE card = {};".format(destination_card))
+                               "WHERE number = {};".format(destination_card))
                 destination_user = cursor.fetchone()
-                if destination_user:
-                    transfer_amount = input("Enter how much money you want to transfer: ")
+                if destination_user is None:
+                    print("Such a card does not exist.")
+                else:
+                    transfer_amount = int(input("Enter how much money you want to transfer: "))
                     if transfer_amount > self.current_balance:
                         print("Not enough money!")
                     else:
                         self.current_balance -= transfer_amount
                         update_balance(self.current_user, self.current_balance)
-                        update_balance(destination_user[0], destination_user[1])
-                else:
-                    print("Such a card does not exist.")
+                        update_balance(destination_user[0], destination_user[1] + transfer_amount)
+                        print("Success!")
             else:
                 print("Probably you made a mistake in the card number. Please try again!")
 
