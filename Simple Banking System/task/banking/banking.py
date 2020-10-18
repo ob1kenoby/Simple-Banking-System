@@ -104,8 +104,7 @@ class APM:
     def add_income(self):
         income = input("Enter income: ")
         self.current_balance += income
-        cursor.execute("UPDATE card SET balance = {0} WHERE id = {1}".format(self.current_balance, self.current_user))
-        connector.commit()
+        self.update_balance()
 
     def transfer(self):
         destination_card = input("Enter card number: ")
@@ -115,9 +114,13 @@ class APM:
                 print("Not enough money!")
             else:
                 self.current_balance -= transfer_amount
-                self.change_balance()
+                self.update_balance()
         else:
             print("Probably you made a mistake in the card number. Please try again!")
+
+    def update_balance(self):
+        cursor.execute("UPDATE card SET balance = {0} WHERE id = {1}".format(self.current_balance, self.current_user))
+        connector.commit()
 
 
 connector = sqlite3.connect('card.s3db')
